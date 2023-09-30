@@ -14,8 +14,8 @@ jobs:
       - name: Compile sourcepawn
         uses: spiretf/spcomp@v0.1.0
         with:
-          source: './executeonjoin.sp'
-          target: './executeonjoin.smx'
+          source: './sourcemod/scripting/executeonjoin.sp'
+          target: './sourcemod/plugins/executeonjoin.smx'
     
       - name: Commit files
         run: |
