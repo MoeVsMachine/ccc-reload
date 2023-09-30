@@ -15,7 +15,7 @@ jobs:
         uses: spiretf/spcomp@v0.1.0
         with:
           source: './sourcemod/scripting/executeonjoin.sp'
-          target: './sourcemod/plugins/executeonjoin.smx'
+          target: './executeonjoin.smx'
     
       - name: Commit files
         run: |
