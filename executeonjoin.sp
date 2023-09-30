@@ -25,8 +25,3 @@ Action OnJoinClass(int client, int args)
     ServerCommand("sm_reloadccc");
     return Plugin_Continue;
 }
-
-//public Action:OnJoinClass(client, args)
-//{
-//ServerCommand("sm_reloadccc")
-//}  

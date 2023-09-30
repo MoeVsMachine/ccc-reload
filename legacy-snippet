@@ -1,0 +1,4 @@
+//public Action:OnJoinClass(client, args)
+//{
+//ServerCommand("sm_reloadccc")
+//}  
