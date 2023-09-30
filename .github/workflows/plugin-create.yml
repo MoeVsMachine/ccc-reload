@@ -7,7 +7,7 @@ on:
       - '**.sp'
     
 jobs:
-  build:
+  build_plugin:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
@@ -21,7 +21,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add executeonjoin.smx
+          git add ./sourcemod/plugins/executeonjoin.smx
           git commit -m "Compile sourcepawn" -a
       - name: Push changes
         uses: ad-m/github-push-action@master
