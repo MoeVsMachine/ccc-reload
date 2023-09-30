@@ -7,7 +7,7 @@ on:
       - '**.sp'
     
 jobs:
-  build:
+  build_plugin:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
