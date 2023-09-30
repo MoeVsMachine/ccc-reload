@@ -21,6 +21,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          git add executeonjoin.smx
           git commit -m "Compile sourcepawn" -a
       - name: Push changes
         uses: ad-m/github-push-action@master
