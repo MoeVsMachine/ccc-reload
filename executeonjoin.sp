@@ -1,27 +1,20 @@
-#include <sourcemod>
- 
-public Plugin myinfo =
+public Plugin:myinfo =
 {
 	name = "Execute on Join",
-	author = "Gnome / Gnomesenpai",
 	description = "Able to execute commands on player join",
-	version = "2.0",
-	url = "https://moevsmachine.tf"
+	author = "Gnome / Gnomesenpai",
+	version = "1.2",
+	url = "http://tf2.gnome.moe"
 };
 
-
-public OnPluginStart()
+public void:OnPluginStart()
 {
-    RegConsoleCmd("joinclass", OnJoinClass, "Joinclass hook");         
+	RegConsoleCmd("joinclass", OnJoinClass, "Joinclass hook", 0);
+	return void:0;
 }
 
-Action OnJoinClass(int client, int args)
+public Action:OnJoinClass(client, args)
 {
-    if (IsFakeClient(client))
-    {
-        return Plugin_Continue;
-    }
-
-    ServerCommand("sm_reloadccc");
-    return Plugin_Continue;
+	ServerCommand("sm_reloadccc");
+	return Action:0;
 }
