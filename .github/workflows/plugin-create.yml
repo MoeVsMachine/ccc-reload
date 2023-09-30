@@ -1,23 +1,37 @@
 name: Compile with SourceMod
 
 on:
-  workflow_dispatch:
+  pull_request:
+    branches: master
+  push:
+    branches: master
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    name: SM version ${{ matrix.sm-version }}
+    strategy:
+      fail-fast: false
+
     steps:
-      - uses: actions/checkout@v1
-    
-      - name: Setup SP
+      - uses: actions/checkout@v2
+
+      - name: Set environment variables
+        run: echo SCRIPTS_PATH=$(pwd) >> $GITHUB_ENV
+      - name: Setup SourcePawn Compiler ${{ matrix.SM_VERSION }}
         id: setup_sp
         uses: rumblefrog/setup-sp@master
         with:
           version: '1.10.x'
-          version-file: ./executeonjoin.sp
-    
-      - run: |
-          spcomp executeonjoin.sp -o output/executeonjoin.smx
-          echo Plugin version ${{ steps.setup_sp.outputs.plugin-version }}
+          version-file: ./example.sp
+
+      - name: Compile plugins
+        run: |
+          for file in example.sp
+          do
+            echo -e "\nCompiling $file..."
+            spcomp -E -w234 -O2 -v2 -i include $file
+          done
+          echo "===OUT FILES==="
+          ls
+          echo version = ${{ steps.setup_sp.outputs.plugin-version }}
+        working-directory: ${{ env.SCRIPTS_PATH }}
