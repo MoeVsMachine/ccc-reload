@@ -19,5 +19,5 @@ jobs:
           version-file: ./executeonjoin.sp
     
       - run: |
-          spcomp -iAnotherIncludeDirectory executeonjoin.sp -o output/executeonjoin.smx
+          spcomp executeonjoin.sp -o output/executeonjoin.smx
           echo Plugin version ${{ steps.setup_sp.outputs.plugin-version }}
