@@ -1,4 +1,6 @@
-public Plugin:myinfo =
+#include <sourcemod>
+ 
+public Plugin myinfo =
 {
 	name = "Execute on Join",
 	description = "Able to execute commands on player join",
@@ -7,7 +9,7 @@ public Plugin:myinfo =
 	url = "http://tf2.gnome.moe"
 };
 
-public void:OnPluginStart()
+public OnPluginStart()
 {
 	RegConsoleCmd("joinclass", OnJoinClass, "Joinclass hook", 0);
 	return void:0;
