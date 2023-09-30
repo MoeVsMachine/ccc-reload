@@ -1,34 +1,28 @@
-name: Compile with SourceMod
+name: Build sourcepawn and commit
 
 on:
   workflow_dispatch:
-
+  push:
+    paths:
+      - '**.sp'
+    
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-
     steps:
       - uses: actions/checkout@v2
-
-      - name: Set environment variables
-        run: echo SCRIPTS_PATH=$(pwd) >> $GITHUB_ENV
-      - name: Setup SourcePawn Compiler ${{ matrix.SM_VERSION }}
-        id: setup_sp
-        uses: rumblefrog/setup-sp@master
+      - name: Compile sourcepawn
+        uses: spiretf/spcomp@v0.1.0
         with:
-          version: '1.10.x'
-          version-file: ./executeonjoin.sp
-
-      - name: Compile plugins
+          source: './executeonjoin.sp'
+          target: './output/executeonjoin.smx'
+    
+      - name: Commit files
         run: |
-          for file in executeonjoin.sp
-          do
-            echo -e "\nCompiling $file..."
-            spcomp -E -w234 -O2 -v2 -i include $file
-          done
-          echo "===OUT FILES==="
-          ls
-          echo version = ${{ steps.setup_sp.outputs.plugin-version }}
-        working-directory: ${{ env.SCRIPTS_PATH }}
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "Compile sourcepawn" -a
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
