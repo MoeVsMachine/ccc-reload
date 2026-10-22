@@ -1,0 +1,80 @@
+name: Compile plugin
+
+# Compiles sourcemod/scripting/*.sp whenever it changes and commits the result to compiled/.
+# The commit only touches compiled/, which is not in the trigger paths, so it cannot loop.
+
+on:
+  push:
+    branches: [live]
+    paths:
+      - "sourcemod/scripting/**.sp"
+      - "sourcemod/scripting/**.inc"
+      - ".github/workflows/compile-plugin.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: compile-plugin
+  cancel-in-progress: false
+
+# Pinned instead of following sm.alliedmods.net/smdrop/1.12/sourcemod-latest-linux:
+# that pointer returns 404 now, while the GitHub release for this build still resolves.
+# 1.12.0.7257 is Windows-only, so 7255 is the newest 1.12 with a Linux tarball.
+env:
+  SM_VERSION: "1.12.0.7255"
+  SM_URL: "https://github.com/alliedmodders/sourcemod/releases/download/1.12.0.7255/sourcemod-1.12.0-git7255-linux.tar.gz"
+
+jobs:
+  compile:
+    runs-on: [self-hosted, linux, x64, sourcemod]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install 32-bit libraries for spcomp
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -q
+          sudo apt-get install -y -q lib32stdc++6 lib32z1
+
+      - name: Download SourceMod compiler
+        run: |
+          set -euo pipefail
+          curl -fsSL "$SM_URL" -o sm.tar.gz
+          mkdir sm && tar -xzf sm.tar.gz -C sm
+          ls -l sm/addons/sourcemod/scripting/spcomp
+          echo "SM_SCRIPTING=$PWD/sm/addons/sourcemod/scripting" >> "$GITHUB_ENV"
+
+      - name: Compile
+        run: |
+          set -euo pipefail
+          mkdir -p compiled
+          for f in sourcemod/scripting/*.sp; do
+            name=$(basename "$f" .sp)
+            "$SM_SCRIPTING/spcomp" "$f" \
+              -i "$SM_SCRIPTING/include" \
+              -i sourcemod/scripting \
+              -o "compiled/${name}.smx"
+          done
+          ls -la compiled
+
+      - name: Commit compiled plugin
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add compiled
+          if git diff --cached --quiet; then
+            echo "Compiled plugin unchanged, nothing to commit."
+            exit 0
+          fi
+          git commit -m "Compile plugin (${GITHUB_SHA::7}, SourceMod ${SM_VERSION})"
+          git pull --rebase origin live
+          git push origin HEAD:live
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-smx
+          path: compiled/*.smx
